@@ -229,5 +229,29 @@ describe 'letsencrypt' do
       end
     end
   end
-  
+
+  context 'on FreeBSD operating system' do
+    let(:facts) { { osfamily: 'FreeBSD', operatingsystem: 'FreeBSD', operatingsystemrelease: '10.3-RELEASE', operatingsystemmajrelease: '10', path: '/usr/bin', puppetversion: '4.5.1' } }
+    let(:params) { { email: 'foo@example.com' } }
+
+    describe 'with defaults' do
+      it { is_expected.to compile }
+
+      it 'should contain the correct resources' do
+        is_expected.to contain_class('letsencrypt::install').with(install_method: 'package').with(package_name: 'py27-certbot')
+        is_expected.to contain_class('letsencrypt').with(package_command: 'certbot')
+        is_expected.to contain_package('letsencrypt').with(name: 'py27-certbot')
+      end
+    end
+
+    describe 'with older puppet without pkng provider' do
+      let(:facts) { { puppetversion: '3.8.5' } }
+      it { is_expected.to compile }
+
+      it 'should attempt vcs install' do
+        is_expected.to contain_class('letsencrypt::install').with(install_method: 'vcs').with(package_name: 'letsencrypt')
+        is_expected.to contain_class('letsencrypt').with(package_command: 'letsencrypt')
+      end
+    end
+  end
 end

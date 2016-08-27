@@ -30,6 +30,10 @@ class letsencrypt::params {
     $install_method = 'package'
     $package_name = 'app-crypt/certbot'
     $package_command = 'certbot'
+  } elsif $::osfamily == 'FreeBSD' and versioncmp($::operatingsystemmajrelease, '10') >= 0 and versioncmp($::puppetversion, '4.1') >= 0 {
+    $install_method = 'package'
+    $package_name = 'py27-certbot'
+    $package_command = 'certbot'
   } else {
     $install_method = 'vcs'
     $package_name = 'letsencrypt'
